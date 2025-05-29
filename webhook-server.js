@@ -17,7 +17,31 @@ const GROUP_CHAT_ID = process.env.GROUP_CHAT_ID;
 app.post('/helius-webhook', async (req, res) => {
   console.log('✅ MINT-событие от Helius:');
   console.dir(req.body, { depth: null });
-  res.sendStatus(200);
+
+  try {
+    const events = req.body;
+
+    if (!Array.isArray(events)) {
+      res.sendStatus(400);
+      return;
+    }
+
+    for (const event of events) {
+      if (event.type !== 'TOKEN_MINT') continue;
+
+      const contract = event.events?.token_mint?.mint || 'неизвестен';
+      const owner = event.description?.split(' ')[0] || 'кошелёк';
+
+      await bot.sendMessage(GROUP_CHAT_ID,
+        `🪙 *MINT-обнаружен!*\n👤 Адрес: \`${owner}\`\n🧾 Контракт: \`${contract}\``,
+        { parse_mode: 'Markdown' });
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('❌ Ошибка обработки webhook:', err);
+    res.sendStatus(500);
+  }
 });
 
   try {
