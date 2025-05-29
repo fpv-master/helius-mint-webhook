@@ -17,6 +17,8 @@ const GROUP_CHAT_ID = process.env.GROUP_CHAT_ID;
 app.post('/helius-webhook', async (req, res) => {
   console.log('✅ MINT-событие от Helius:');
   console.dir(req.body, { depth: null });
+  res.sendStatus(200);
+});
 
   try {
     const events = req.body; // массив событий
